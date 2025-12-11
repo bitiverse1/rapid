@@ -1,0 +1,15 @@
+# Ignore build artifacts and config files when publishing
+dist/
+src/
+*.ts
+!*.d.ts
+tsconfig.json
+.eslintrc.*
+.prettierrc.*
+jest.config.*
+*.test.ts
+*.spec.ts
+__tests__/
+coverage/
+.github/
+.vscode/

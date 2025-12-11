@@ -1,0 +1,59 @@
+# Dependencies
+node_modules/
+.pnp/
+.pnp.js
+
+# Testing
+coverage/
+.nyc_output/
+
+# Build outputs
+dist/
+build/
+*.tsbuildinfo
+
+# CDK
+cdk.out/
+.cdk.staging/
+
+# AWS SAM
+.aws-sam/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
+
+# Package manager locks (keep pnpm-lock.yaml)
+package-lock.json
+yarn.lock
+
+# Build artifacts
+*.js.map
+*.d.ts.map

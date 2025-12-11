@@ -1,0 +1,17 @@
+{
+  "name": "@rapid/constants",
+  "version": "1.0.0",
+  "description": "Shared constants, enums, and status codes",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

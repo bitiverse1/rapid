@@ -1,0 +1,19 @@
+{
+  "name": "@rapid/schemas",
+  "version": "1.0.0",
+  "description": "Zod validation schemas for runtime data validation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

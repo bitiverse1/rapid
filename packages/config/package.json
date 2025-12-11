@@ -1,0 +1,19 @@
+{
+  "name": "@rapid/config",
+  "version": "1.0.0",
+  "description": "Configuration management system with base config and dynamic getter",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@rapid/constants": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}

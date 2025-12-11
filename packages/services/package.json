@@ -1,0 +1,23 @@
+{
+  "name": "@rapid/services",
+  "version": "1.0.0",
+  "description": "Shared business logic and third-party integrations",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "clean": "rm -rf dist",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.713.0",
+    "@aws-sdk/lib-dynamodb": "^3.713.0",
+    "@rapid/errors": "workspace:*",
+    "@rapid/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "typescript": "^5.7.2"
+  }
+}
