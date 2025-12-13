@@ -57,3 +57,6 @@ yarn.lock
 # Build artifacts
 *.js.map
 *.d.ts.map
+
+# Testing
+/apps/test-*

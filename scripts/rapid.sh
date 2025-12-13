@@ -124,7 +124,7 @@ print_success "Description set"
 
 echo ""
 
-# For cloud apps, ask about React
+# For cloud apps, ask about React and environments
 INCLUDE_REACT=false
 if [ "$APP_TYPE" = "cloud" ]; then
     ask_question "Do you want to include a React frontend?"
@@ -137,20 +137,20 @@ if [ "$APP_TYPE" = "cloud" ]; then
         print_info "Skipping React frontend"
     fi
     echo ""
-fi
+    
+    # Ask about environments
+    ask_question "Do you want to use the default environments (dev, test, prod)?"
+    read -p "$(echo -e "${ARROW} Use defaults? [Y/n]: ")" use_default_envs
 
-# Ask about environments
-ask_question "Do you want to use the default environments (dev, test, prod)?"
-read -p "$(echo -e "${ARROW} Use defaults? [Y/n]: ")" use_default_envs
-
-if [[ $use_default_envs =~ ^[Nn]$ ]]; then
-    ask_question "Enter your custom environments (comma-separated, e.g., dev,qa,staging,prod):"
-    read -p "$(echo -e "${ARROW} Environments: ")" custom_envs
-    ENVIRONMENTS=${custom_envs}
-    print_success "Custom environments set: ${ENVIRONMENTS}"
-else
-    ENVIRONMENTS="dev,test,prod"
-    print_success "Using default environments: dev, test, prod"
+    if [[ $use_default_envs =~ ^[Nn]$ ]]; then
+        ask_question "Enter your custom environments (comma-separated, e.g., dev,qa,staging,prod):"
+        read -p "$(echo -e "${ARROW} Environments: ")" custom_envs
+        ENVIRONMENTS=${custom_envs}
+        print_success "Custom environments set: ${ENVIRONMENTS}"
+    else
+        ENVIRONMENTS="dev,test,prod"
+        print_success "Using default environments: dev, test, prod"
+    fi
 fi
 
 echo ""
@@ -162,8 +162,8 @@ echo -e "  ${WHITE}Name:${NC}         ${YELLOW}${app_name}${NC}"
 echo -e "  ${WHITE}Description:${NC}  ${YELLOW}${app_description}${NC}"
 if [ "$APP_TYPE" = "cloud" ]; then
     echo -e "  ${WHITE}React:${NC}        ${YELLOW}${INCLUDE_REACT}${NC}"
+    echo -e "  ${WHITE}Environments:${NC} ${YELLOW}${ENVIRONMENTS}${NC}"
 fi
-echo -e "  ${WHITE}Environments:${NC} ${YELLOW}${ENVIRONMENTS}${NC}"
 echo -e "${BOLD}${CYAN}═══════════════════════════════════════════════════════${NC}"
 echo ""
 
