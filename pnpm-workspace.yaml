@@ -1,5 +1,6 @@
 packages:
-- 'packages/*'
-- 'apps/*'
-- 'apps/examples/*'
-- 'lambdas/*'
+  - 'packages/*'
+  - 'apps/*'
+  - 'apps/examples/*'
+  - 'lambdas/*'
+  - '!apps/*/frontend'

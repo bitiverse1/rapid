@@ -85,6 +85,37 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  apps/test-aaa:
+    dependencies:
+      '@rapid/cdk':
+        specifier: workspace:*
+        version: link:../../packages/cdk
+      '@rapid/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@rapid/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
+      '@rapid/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      aws-cdk-lib:
+        specifier: ^2.161.1
+        version: 2.232.1(constructs@10.4.3)
+      constructs:
+        specifier: ^10.0.0
+        version: 10.4.3
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.19.2
+      aws-cdk:
+        specifier: ^2.161.1
+        version: 2.1034.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/cdk:
     dependencies:
       '@rapid/config':
@@ -1102,6 +1133,11 @@ packages:
       - yaml
       - mime-types
 
+  aws-cdk@2.1034.0:
+    resolution: {integrity: sha512-YsIeXmMP/9eGml/eoPs64kHzNR0IVezzwuH0XrLOtUCjYNb80cmmjoCNsMn96u9rJOte1Yg3jitrHi1wTqXAqw==}
+    engines: {node: '>= 18.0.0'}
+    hasBin: true
+
   babel-jest@29.7.0:
     resolution: {integrity: sha512-BrvGY3xZSwEcCzKvKsCi2GgHqDqsYkOP4/by5xCgIwGXQxIEh+8ew3gmrE1y7XRR6LHZIj6yLYnUi/mm2KXKBg==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
@@ -1564,6 +1600,11 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -4142,6 +4183,10 @@ snapshots:
       '@aws-cdk/cloud-assembly-schema': 48.20.0
       constructs: 10.4.3
 
+  aws-cdk@2.1034.0:
+    optionalDependencies:
+      fsevents: 2.3.2
+
   babel-jest@29.7.0(@babel/core@7.28.5):
     dependencies:
       '@babel/core': 7.28.5
@@ -4699,6 +4744,9 @@ snapshots:
       is-callable: 1.2.7
 
   fs.realpath@1.0.0: {}
+
+  fsevents@2.3.2:
+    optional: true
 
   fsevents@2.3.3:
     optional: true

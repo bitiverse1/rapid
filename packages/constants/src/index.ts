@@ -18,24 +18,24 @@ export const HTTP_STATUS = {
 };
 
 // Order Status
-export const ORDER_STATUS: Record<string, string> = {
+export const ORDER_STATUS = {
   PENDING: 'PENDING',
   PROCESSING: 'PROCESSING',
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',
   REFUNDED: 'REFUNDED',
-};
+} as const satisfies Record<string, string>;
 
 // User Status
-export const USER_STATUS: Record<string, string> = {
+export const USER_STATUS = {
   ACTIVE: 'ACTIVE',
   INACTIVE: 'INACTIVE',
   SUSPENDED: 'SUSPENDED',
   DELETED: 'DELETED',
-};
+} as const satisfies Record<string, string>;
 
 // Error Codes
-export const ERROR_CODES: Record<string, string> = {
+export const ERROR_CODES = {
   VALIDATION_ERROR: 'VALIDATION_ERROR',
   AUTHENTICATION_ERROR: 'AUTHENTICATION_ERROR',
   AUTHORIZATION_ERROR: 'AUTHORIZATION_ERROR',
@@ -45,32 +45,32 @@ export const ERROR_CODES: Record<string, string> = {
   INTERNAL_ERROR: 'INTERNAL_ERROR',
   DATABASE_ERROR: 'DATABASE_ERROR',
   EXTERNAL_SERVICE_ERROR: 'EXTERNAL_SERVICE_ERROR',
-};
+} as const satisfies Record<string, string>;
 
 // AWS Region
-export const AWS_REGIONS: Record<string, string> = {
+export const AWS_REGIONS = {
   US_EAST_1: 'us-east-1',
   US_WEST_2: 'us-west-2',
   EU_WEST_1: 'eu-west-1',
   AP_SOUTHEAST_1: 'ap-southeast-1',
-};
+} as const satisfies Record<string, string>;
 
 // Environment Types
-export const ENVIRONMENTS: Record<string, string> = {
+export const ENVIRONMENTS = {
   DEV: 'dev',
   TEST: 'test',
   STAGE: 'staging',
   PROD: 'prod',
   QA: 'qa',
-};
+} as const satisfies Record<string, string>;
 
 // Log Levels
-export const LOG_LEVELS: Record<string, string> = {
+export const LOG_LEVELS = {
   DEBUG: 'DEBUG',
   INFO: 'INFO',
   WARN: 'WARN',
   ERROR: 'ERROR',
-};
+} as const satisfies Record<string, string>;
 
 // Pagination Defaults
 export const PAGINATION = {
@@ -88,20 +88,20 @@ export const CACHE_TTL = {
 };
 
 // API Versioning
-export const API_VERSION: Record<string, string> = {
+export const API_VERSION = {
   V1: 'v1',
   V2: 'v2',
-};
+} as const satisfies Record<string, string>;
 
 // Content Types
-export const CONTENT_TYPES: Record<string, string> = {
+export const CONTENT_TYPES = {
   JSON: 'application/json',
   XML: 'application/xml',
   HTML: 'text/html',
   TEXT: 'text/plain',
   FORM_DATA: 'multipart/form-data',
   URL_ENCODED: 'application/x-www-form-urlencoded',
-};
+} as const satisfies Record<string, string>;
 
 export const SERVICE_PRINCIPALS = {
   APIGATEWAY: 'apigateway.amazonaws.com',
