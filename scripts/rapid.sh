@@ -191,7 +191,6 @@ if [ "$APP_TYPE" = "cloud" ]; then
     # Create directories
     mkdir -p "${APP_DIR}/src/stacks"
     mkdir -p "${APP_DIR}/src/constructs"
-    mkdir -p "${APP_DIR}/src/config"
     
     if [ "$INCLUDE_FRONTEND" = true ]; then
         mkdir -p "${APP_DIR}/frontend"
@@ -280,7 +279,7 @@ import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
 import { getConfig } from '@rapid/config';
 import { PASCAL_CASE_NAMEStack } from './stacks/PASCAL_CASE_NAMEStack';
-import { configs } from './config/config';
+import { configs } from './config';
 
 const app = new cdk.App();
 
@@ -314,7 +313,7 @@ EOF
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import type { ConfigController } from '@rapid/config';
-import type { AppConfig } from '../config/types';
+import type { AppConfig } from '../types';
 
 export interface PASCAL_CASE_NAMEStackProps extends cdk.StackProps {
   configCtrl: ConfigController<AppConfig>;
@@ -416,7 +415,7 @@ EOF
     print_step "Creating configuration files..."
     
     # Create config types
-    cat > "${APP_DIR}/src/config/types.ts" <<'EOF'
+    cat > "${APP_DIR}/src/types.ts" <<'EOF'
 import type { BaseConfig } from '@rapid/config';
 
 export interface AppConfig extends BaseConfig {
@@ -429,7 +428,7 @@ EOF
     IFS=',' read -ra ENV_ARRAY <<< "$ENVIRONMENTS"
     
     # Start config file
-    cat > "${APP_DIR}/src/config/config.ts" <<'EOF'
+    cat > "${APP_DIR}/src/config.ts" <<'EOF'
 import { AWS_REGIONS, LOG_LEVELS } from '@rapid/constants';
 import type { AppConfig } from './types';
 
@@ -439,7 +438,7 @@ EOF
     # Add each environment
     for env in "${ENV_ARRAY[@]}"; do
         env=$(echo "$env" | xargs) # trim whitespace
-        cat >> "${APP_DIR}/src/config/config.ts" <<CONFIGEOF
+        cat >> "${APP_DIR}/src/config.ts" <<CONFIGEOF
   ${env}: {
     stage: '${env}',
     project: '${app_name}',
@@ -455,7 +454,7 @@ CONFIGEOF
     done
     
     # Finish config file
-    cat >> "${APP_DIR}/src/config/config.ts" <<'EOF'
+    cat >> "${APP_DIR}/src/config.ts" <<'EOF'
 };
 EOF
     print_success "Configuration created with environments: ${ENVIRONMENTS}"
