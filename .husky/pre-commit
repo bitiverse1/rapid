@@ -1,2 +1,6 @@
+echo "🔍 Running pre-commit hook..."
+echo "📝 Fixing linting issues..."
 pnpm lint:fix
+echo "✅ Staging fixed files..."
 git add -u
+echo "✨ Pre-commit checks complete!"
