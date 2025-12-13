@@ -85,7 +85,7 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  apps/test-aaa:
+  apps/my-app-123:
     dependencies:
       '@rapid/cdk':
         specifier: workspace:*

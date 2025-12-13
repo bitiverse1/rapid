@@ -269,8 +269,8 @@ EOF
 EOF
     print_success "CDK tsconfig.json created"
     
-    # Convert app name to PascalCase for class names
-    PASCAL_CASE_NAME=$(echo "$app_name" | perl -pe 's/(^|-)([a-z])/\U$2/g')
+    # Convert app name to PascalCase for class names (handles letters and numbers)
+    PASCAL_CASE_NAME=$(echo "$app_name" | perl -pe 's/(^|-)([a-z0-9])/\U$2/g')
     
     # Create CDK bin file
     print_step "Creating CDK application entry point..."
