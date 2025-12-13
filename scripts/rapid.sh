@@ -124,17 +124,17 @@ print_success "Description set"
 
 echo ""
 
-# For cloud apps, ask about React and environments
-INCLUDE_REACT=false
+# For cloud apps, ask about frontend and environments
+INCLUDE_FRONTEND=false
 if [ "$APP_TYPE" = "cloud" ]; then
-    ask_question "Do you want to include a React frontend?"
-    read -p "$(echo -e "${ARROW} Include React? [y/N]: ")" include_react
+    ask_question "Do you want to include a frontend?"
+    read -p "$(echo -e "${ARROW} Include frontend? [y/N]: ")" include_frontend
     
-    if [[ $include_react =~ ^[Yy]$ ]]; then
-        INCLUDE_REACT=true
-        print_success "Will include React frontend with Vite"
+    if [[ $include_frontend =~ ^[Yy]$ ]]; then
+        INCLUDE_FRONTEND=true
+        print_success "Will include frontend with Vite (you'll select the framework next)"
     else
-        print_info "Skipping React frontend"
+        print_info "Skipping frontend"
     fi
     echo ""
     
@@ -161,7 +161,11 @@ echo -e "  ${WHITE}Type:${NC}         ${YELLOW}${APP_TYPE}${NC}"
 echo -e "  ${WHITE}Name:${NC}         ${YELLOW}${app_name}${NC}"
 echo -e "  ${WHITE}Description:${NC}  ${YELLOW}${app_description}${NC}"
 if [ "$APP_TYPE" = "cloud" ]; then
-    echo -e "  ${WHITE}React:${NC}        ${YELLOW}${INCLUDE_REACT}${NC}"
+    if [ "$INCLUDE_FRONTEND" = true ]; then
+        echo -e "  ${WHITE}Frontend:${NC}     ${YELLOW}Yes (Vite)${NC}"
+    else
+        echo -e "  ${WHITE}Frontend:${NC}     ${YELLOW}No${NC}"
+    fi
     echo -e "  ${WHITE}Environments:${NC} ${YELLOW}${ENVIRONMENTS}${NC}"
 fi
 echo -e "${BOLD}${CYAN}═══════════════════════════════════════════════════════${NC}"
@@ -189,7 +193,7 @@ if [ "$APP_TYPE" = "cloud" ]; then
     mkdir -p "${APP_DIR}/cdk/src/constructs"
     mkdir -p "${APP_DIR}/config/src"
     
-    if [ "$INCLUDE_REACT" = true ]; then
+    if [ "$INCLUDE_FRONTEND" = true ]; then
         mkdir -p "${APP_DIR}/frontend"
     fi
     
@@ -484,12 +488,20 @@ EOF
 EOF
     print_success "Config package created"
     
-    # Create React app if needed
-    if [ "$INCLUDE_REACT" = true ]; then
-        print_step "Initializing React application with Vite..."
+    # Create frontend app if needed
+    if [ "$INCLUDE_FRONTEND" = true ]; then
+        print_step "Initializing frontend application with Vite..."
+        print_info "Vite will now ask you to select a framework and variant"
         cd "${APP_DIR}"
-        pnpm create vite@latest frontend -- --template react-ts
-        print_success "React app initialized"
+        pnpm create vite@latest frontend
+        print_success "Frontend app initialized"
+        
+        # Install frontend dependencies
+        print_step "Installing frontend dependencies..."
+        cd "${APP_DIR}/frontend"
+        pnpm install
+        print_success "Frontend dependencies installed"
+        cd "${WORKSPACE_ROOT}"
     fi
     
     # Create root README
@@ -507,9 +519,9 @@ ${app_name}/
 ├── config/           # Environment configuration
 READMEEOF
     
-    if [ "$INCLUDE_REACT" = true ]; then
+    if [ "$INCLUDE_FRONTEND" = true ]; then
         cat >> "${APP_DIR}/README.md" <<'EOF'
-├── frontend/         # React frontend application
+├── frontend/         # Frontend application
 EOF
     fi
     
@@ -575,7 +587,7 @@ pnpm cdk deploy -c environment=prod
 
 READMEEOF3
     
-    if [ "$INCLUDE_REACT" = true ]; then
+    if [ "$INCLUDE_FRONTEND" = true ]; then
         cat >> "${APP_DIR}/README.md" <<'EOF'
 ### Frontend Development
 
@@ -800,7 +812,7 @@ echo -e "  ${CYAN}1.${NC} cd apps/${app_name}"
 if [ "$APP_TYPE" = "cloud" ]; then
     echo -e "  ${CYAN}2.${NC} cd config && pnpm build"
     echo -e "  ${CYAN}3.${NC} cd ../cdk && pnpm build"
-    if [ "$INCLUDE_REACT" = true ]; then
+    if [ "$INCLUDE_FRONTEND" = true ]; then
         echo -e "  ${CYAN}4.${NC} cd ../frontend && pnpm install && pnpm dev"
     fi
 else
