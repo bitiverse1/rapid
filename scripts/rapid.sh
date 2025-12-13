@@ -189,8 +189,9 @@ if [ "$APP_TYPE" = "cloud" ]; then
     print_step "Setting up cloud application..."
     
     # Create directories
-    mkdir -p "${APP_DIR}/src/stacks"
-    mkdir -p "${APP_DIR}/src/constructs"
+    mkdir -p "${APP_DIR}/cdk/stacks"
+    mkdir -p "${APP_DIR}/cdk/constructs"
+    mkdir -p "${APP_DIR}/lambdas"
     
     if [ "$INCLUDE_FRONTEND" = true ]; then
         mkdir -p "${APP_DIR}/frontend"
@@ -202,56 +203,48 @@ if [ "$APP_TYPE" = "cloud" ]; then
     # Parse environments for script generation
     IFS=',' read -ra ENV_ARRAY <<< "$ENVIRONMENTS"
     
-    # Start package.json
-    cat > "${APP_DIR}/package.json" <<'EOF'
-{
-  "name": "@rapid/APP_NAME",
-  "version": "1.0.0",
-  "description": "APP_DESCRIPTION",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "scripts": {
-    "build": "tsc",
-    "watch": "tsc --watch",
-    "clean": "rm -rf dist",
-    "cdk": "cdk",
-EOF
+    # Use Node.js to generate package.json with proper JSON formatting
+    node -e "
+    const envs = '${ENVIRONMENTS}'.split(',').map(e => e.trim());
+    const scripts = {
+      'build': 'tsc',
+      'watch': 'tsc --watch',
+      'clean': 'rm -rf dist',
+      'cdk': 'cdk'
+    };
     
-    # Add environment-specific scripts
-    for env in "${ENV_ARRAY[@]}"; do
-        env=$(echo "$env" | xargs) # trim whitespace
-        cat >> "${APP_DIR}/package.json" <<SCRIPTEOF
-    "deploy:${env}": "cdk deploy -c environment=${env}",
-    "synth:${env}": "cdk synth -c environment=${env}",
-    "diff:${env}": "cdk diff -c environment=${env}",
-    "destroy:${env}": "cdk destroy -c environment=${env}",
-SCRIPTEOF
-    done
+    envs.forEach(env => {
+      scripts[\`deploy:\${env}\`] = \`cdk deploy -c environment=\${env}\`;
+      scripts[\`synth:\${env}\`] = \`cdk synth -c environment=\${env}\`;
+      scripts[\`diff:\${env}\`] = \`cdk diff -c environment=\${env}\`;
+      scripts[\`destroy:\${env}\`] = \`cdk destroy -c environment=\${env}\`;
+    });
     
-    # Finish package.json
-    cat >> "${APP_DIR}/package.json" <<'EOF'
-    "deploy": "cdk deploy",
-    "diff": "cdk diff",
-    "synth": "cdk synth",
-    "destroy": "cdk destroy"
-  },
-  "dependencies": {
-    "@rapid/cdk": "workspace:*",
-    "@rapid/config": "workspace:*",
-    "@rapid/constants": "workspace:*",
-    "@rapid/types": "workspace:*",
-    "aws-cdk-lib": "^2.161.1",
-    "constructs": "^10.0.0"
-  },
-  "devDependencies": {
-    "@types/node": "^22.10.1",
-    "aws-cdk": "^2.161.1",
-    "typescript": "^5.7.2"
-  }
-}
-EOF
-    sed -i '' "s/APP_NAME/${app_name}/g" "${APP_DIR}/package.json"
-    sed -i '' "s/APP_DESCRIPTION/${app_description}/g" "${APP_DIR}/package.json"
+    const pkg = {
+      name: '@rapid/${app_name}',
+      version: '1.0.0',
+      description: '${app_description}',
+      main: 'dist/cdk/app.js',
+      types: 'dist/cdk/app.d.ts',
+      scripts,
+      dependencies: {
+        '@rapid/cdk': 'workspace:*',
+        '@rapid/config': 'workspace:*',
+        '@rapid/constants': 'workspace:*',
+        '@rapid/types': 'workspace:*',
+        'aws-cdk-lib': '^2.161.1',
+        'constructs': '^10.0.0'
+      },
+      devDependencies: {
+        '@types/node': '^22.10.1',
+        'aws-cdk': '^2.161.1',
+        'typescript': '^5.7.2'
+      }
+    };
+    
+    console.log(JSON.stringify(pkg, null, 2));
+    " > "${APP_DIR}/package.json"
+    
     print_success "Package.json created"
     
     # Create tsconfig.json
@@ -260,10 +253,10 @@ EOF
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./cdk"
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["cdk/**/*"],
+  "exclude": ["node_modules", "dist", "lambdas", "frontend"]
 }
 EOF
     print_success "CDK tsconfig.json created"
@@ -273,7 +266,7 @@ EOF
     
     # Create CDK bin file
     print_step "Creating CDK application entry point..."
-    cat > "${APP_DIR}/src/app.ts" <<'EOF'
+    cat > "${APP_DIR}/cdk/app.ts" <<'EOF'
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
@@ -304,12 +297,12 @@ new PASCAL_CASE_NAMEStack(app, `PASCAL_CASE_NAMEStack-${configCtrl.get('stage')}
 
 app.synth();
 EOF
-    sed -i '' "s/PASCAL_CASE_NAME/${PASCAL_CASE_NAME}/g" "${APP_DIR}/src/app.ts"
+    sed -i '' "s/PASCAL_CASE_NAME/${PASCAL_CASE_NAME}/g" "${APP_DIR}/cdk/app.ts"
     print_success "CDK entry point created"
     
     # Create CDK stack
     print_step "Creating CDK stack..."
-    cat > "${APP_DIR}/src/stacks/${PASCAL_CASE_NAME}Stack.ts" <<'EOF'
+    cat > "${APP_DIR}/cdk/stacks/${PASCAL_CASE_NAME}Stack.ts" <<'EOF'
 import * as cdk from 'aws-cdk-lib';
 import { Construct } from 'constructs';
 import type { ConfigController } from '@rapid/config';
@@ -335,13 +328,13 @@ export class PASCAL_CASE_NAMEStack extends cdk.Stack {
   }
 }
 EOF
-    sed -i '' "s/PASCAL_CASE_NAME/${PASCAL_CASE_NAME}/g" "${APP_DIR}/src/stacks/${PASCAL_CASE_NAME}Stack.ts"
+    sed -i '' "s/PASCAL_CASE_NAME/${PASCAL_CASE_NAME}/g" "${APP_DIR}/cdk/stacks/${PASCAL_CASE_NAME}Stack.ts"
     print_success "CDK stack created"
     
     # Create cdk.json (this is a large file, keeping it as-is)
     cat > "${APP_DIR}/cdk.json" <<'EOF'
 {
-  "app": "npx ts-node src/app.ts",
+  "app": "npx ts-node cdk/app.ts",
   "watch": {
     "include": ["**"],
     "exclude": [
@@ -415,7 +408,7 @@ EOF
     print_step "Creating configuration files..."
     
     # Create config types
-    cat > "${APP_DIR}/src/types.ts" <<'EOF'
+    cat > "${APP_DIR}/cdk/types.ts" <<'EOF'
 import type { BaseConfig } from '@rapid/config';
 
 export interface AppConfig extends BaseConfig {
@@ -428,7 +421,7 @@ EOF
     IFS=',' read -ra ENV_ARRAY <<< "$ENVIRONMENTS"
     
     # Start config file
-    cat > "${APP_DIR}/src/config.ts" <<'EOF'
+    cat > "${APP_DIR}/cdk/config.ts" <<'EOF'
 import { AWS_REGIONS, LOG_LEVELS } from '@rapid/constants';
 import type { AppConfig } from './types';
 
@@ -438,7 +431,7 @@ EOF
     # Add each environment
     for env in "${ENV_ARRAY[@]}"; do
         env=$(echo "$env" | xargs) # trim whitespace
-        cat >> "${APP_DIR}/src/config.ts" <<CONFIGEOF
+        cat >> "${APP_DIR}/cdk/config.ts" <<CONFIGEOF
   ${env}: {
     stage: '${env}',
     project: '${app_name}',
@@ -454,7 +447,7 @@ CONFIGEOF
     done
     
     # Finish config file
-    cat >> "${APP_DIR}/src/config.ts" <<'EOF'
+    cat >> "${APP_DIR}/cdk/config.ts" <<'EOF'
 };
 EOF
     print_success "Configuration created with environments: ${ENVIRONMENTS}"
@@ -488,7 +481,12 @@ ${app_description}
 \`\`\`
 ${app_name}/
 ├── cdk/              # AWS CDK infrastructure
-├── config/           # Environment configuration
+│   ├── app.ts        # CDK app entry point
+│   ├── config.ts     # Environment configuration
+│   ├── types.ts      # TypeScript type definitions
+│   ├── stacks/       # CDK stacks
+│   └── constructs/   # Reusable CDK constructs
+├── lambdas/          # Lambda function handlers
 READMEEOF
     
     if [ "$INCLUDE_FRONTEND" = true ]; then
@@ -513,7 +511,7 @@ READMEEOF2
     
     cat >> "${APP_DIR}/README.md" <<READMEEOF3
 
-Configuration is managed via the \`@rapid/${app_name}-config\` package using the \`ConfigController\`.
+Configuration is managed via the \`config.ts\` file using the \`ConfigController\`.
 
 ## Development
 
@@ -533,8 +531,6 @@ pnpm install
 ### CDK Commands
 
 \`\`\`bash
-cd cdk
-
 # Build the CDK app
 pnpm build
 
@@ -782,10 +778,10 @@ echo ""
 print_step "Next steps:"
 echo -e "  ${CYAN}1.${NC} cd apps/${app_name}"
 if [ "$APP_TYPE" = "cloud" ]; then
-    echo -e "  ${CYAN}2.${NC} cd config && pnpm build"
-    echo -e "  ${CYAN}3.${NC} cd ../cdk && pnpm build"
+    echo -e "  ${CYAN}2.${NC} pnpm build"
+    echo -e "  ${CYAN}3.${NC} pnpm synth"
     if [ "$INCLUDE_FRONTEND" = true ]; then
-        echo -e "  ${CYAN}4.${NC} cd ../frontend && pnpm install && pnpm dev"
+        echo -e "  ${CYAN}4.${NC} cd frontend && pnpm dev"
     fi
 else
     echo -e "  ${CYAN}2.${NC} pnpm build"
