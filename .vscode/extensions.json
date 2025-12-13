@@ -3,8 +3,7 @@
     "dbaeumer.vscode-eslint",
     "esbenp.prettier-vscode",
     "firsttris.vscode-jest-runner",
-    "ms-vscode.vscode-typescript-next",
-    "amazonwebservices.aws-toolkit-vscode"
+    "ms-vscode.vscode-typescript-next"
   ],
   "unwantedRecommendations": []
 }

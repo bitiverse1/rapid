@@ -13,7 +13,9 @@
   "dependencies": {
     "aws-cdk-lib": "^2.172.0",
     "constructs": "^10.4.2",
-    "@rapid/constants": "workspace:*"
+    "@rapid/constants": "workspace:*",
+    "@rapid/utilities": "workspace:*",
+    "@rapid/config": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^22.10.1",

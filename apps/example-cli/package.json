@@ -1,0 +1,32 @@
+{
+  "name": "@rapid/example-cli",
+  "version": "1.0.0",
+  "description": "Example cli application",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "example-cli": "./dist/cli.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "dev": "ts-node src/cli.ts",
+    "start": "node dist/cli.js"
+  },
+  "dependencies": {
+    "@rapid/constants": "workspace:*",
+    "@rapid/errors": "workspace:*",
+    "@rapid/types": "workspace:*",
+    "@rapid/utilities": "workspace:*",
+    "commander": "^12.1.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.6"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^9.0.7",
+    "@types/node": "^22.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}

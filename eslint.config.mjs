@@ -7,6 +7,14 @@ import prettierConfig from 'eslint-config-prettier';
 export default [
   js.configs.recommended,
   {
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/build/**',
+      '**/coverage/**',
+    ],
+  },
+  {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
       parser: tsParser,
@@ -55,15 +63,15 @@ export default [
         'error',
         {
           groups: [
-            'builtin',
             'external',
             'internal',
+            'builtin',
             'parent',
             'sibling',
             'index',
           ],
-          'newlines-between': 'always',
-          alphabetize: { order: 'asc', caseInsensitive: true },
+          'newlines-between': 'never',
+          alphabetize: { order: 'desc', caseInsensitive: false },
         },
       ],
     },

@@ -117,3 +117,8 @@ export interface PaginationParams {
   sortBy?: string;
   sortOrder?: 'asc' | 'desc';
 }
+
+export interface Tag {
+  key: string;
+  value: string;
+}

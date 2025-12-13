@@ -1,26 +1,7 @@
-import type { AppConfig } from './types';
+import { BaseConfig } from './types';
 import { ConfigController } from './config-controller';
 
-/**
- * Generic configuration loader that creates a ConfigController
- *
- * @param configs - Map of stage names to configuration objects
- * @param stage - Optional stage override (defaults to env vars)
- * @returns ConfigController instance with the loaded configuration
- *
- * @example
- * ```typescript
- * import { getConfig } from '@rapid/config';
- * import { devConfig } from './dev.config';
- * import { prodConfig } from './prod.config';
- *
- * const configCtrl = getConfig({
- *   dev: devConfig,
- *   prod: prodConfig
- * });
- * ```
- */
-export function getConfig<T extends AppConfig>(
+export function getConfig<T extends BaseConfig>(
   configs: Record<string, T>,
   stage?: string
 ): ConfigController<T> {

@@ -1,4 +1,5 @@
-import type { AWSRegion, LogLevel } from '@rapid/constants';
+import type { Tag } from '@rapid/types';
+import type { AWSRegionType, LogLevelType } from '@rapid/constants';
 
 /**
  * Base configuration that all app configs must extend
@@ -22,15 +23,15 @@ export interface BaseConfig {
   /**
    * AWS Region for deployment
    */
-  awsRegion: AWSRegion;
+  awsRegion: AWSRegionType;
 
   /**
    * Logging level
    */
-  logLevel: LogLevel;
-}
+  logLevel: LogLevelType;
 
-/**
- * App-specific config extends BaseConfig with additional properties
- */
-export type AppConfig = BaseConfig;
+  /**
+   * Optional tags to apply to resources
+   */
+  tags?: Tag[];
+}

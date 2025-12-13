@@ -11,9 +11,11 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@aws-lambda-powertools/logger": "^2.30.0",
     "@rapid/errors": "workspace:*"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.159",
     "@types/node": "^22.10.1",
     "typescript": "^5.7.2"
   }

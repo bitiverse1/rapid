@@ -1,7 +1,4 @@
-import {
-  DynamoDBClient,
-  DynamoDBClientConfig,
-} from '@aws-sdk/client-dynamodb';
+import { DatabaseError, NotFoundError } from '@rapid/errors';
 import {
   DynamoDBDocumentClient,
   GetCommand,
@@ -11,7 +8,7 @@ import {
   QueryCommand,
   ScanCommand,
 } from '@aws-sdk/lib-dynamodb';
-import { DatabaseError, NotFoundError } from '@rapid/errors';
+import { DynamoDBClient, DynamoDBClientConfig } from '@aws-sdk/client-dynamodb';
 
 export interface DynamoDBServiceConfig {
   region?: string;
