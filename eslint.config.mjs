@@ -12,10 +12,12 @@ export default [
       '**/dist/**',
       '**/build/**',
       '**/coverage/**',
+      '**/frontend/**',
     ],
   },
   {
     files: ['**/*.ts', '**/*.tsx'],
+    ignores: ['**/frontend/**'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {

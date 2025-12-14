@@ -1,0 +1,39 @@
+{
+  "name": "@rapid/example-react-mui",
+  "version": "1.0.0",
+  "description": "Example react app with mui",
+  "main": "dist/cdk/app.js",
+  "types": "dist/cdk/app.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist",
+    "cdk": "cdk",
+    "deploy:dev": "cdk deploy -c stage=dev",
+    "synth:dev": "cdk synth -c stage=dev",
+    "diff:dev": "cdk diff -c stage=dev",
+    "destroy:dev": "cdk destroy -c stage=dev",
+    "deploy:test": "cdk deploy -c stage=test",
+    "synth:test": "cdk synth -c stage=test",
+    "diff:test": "cdk diff -c stage=test",
+    "destroy:test": "cdk destroy -c stage=test",
+    "deploy:prod": "cdk deploy -c stage=prod",
+    "synth:prod": "cdk synth -c stage=prod",
+    "diff:prod": "cdk diff -c stage=prod",
+    "destroy:prod": "cdk destroy -c stage=prod",
+    "dev": "npm --prefix frontend run dev"
+  },
+  "dependencies": {
+    "@rapid/cdk": "workspace:*",
+    "@rapid/config": "workspace:*",
+    "@rapid/constants": "workspace:*",
+    "@rapid/types": "workspace:*",
+    "aws-cdk-lib": "^2.161.1",
+    "constructs": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "aws-cdk": "^2.161.1",
+    "typescript": "^5.7.2"
+  }
+}

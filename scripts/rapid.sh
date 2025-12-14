@@ -220,6 +220,11 @@ if [ "$APP_TYPE" = "cloud" ]; then
       scripts[\`destroy:\${env}\`] = \`cdk destroy -c stage=\${env}\`;
     });
     
+    // Add dev script if frontend is included
+    if (${INCLUDE_FRONTEND}) {
+      scripts['dev'] = 'npm --prefix frontend run dev';
+    }
+    
     const pkg = {
       name: '@rapid/${app_name}',
       version: '1.0.0',
@@ -352,7 +357,7 @@ EOF
   "context": {
     "@aws-cdk/aws-lambda:recognizeLayerVersion": true,
     "@aws-cdk/core:checkSecretUsage": true,
-    "@aws-cdk/core:target-partitions": ["aws", "aws-cn"],
+    "@aws-cdk/core:target-partitions": ["aws"],
     "@aws-cdk-containers/ecs-service-extensions:enableDefaultLogDriver": true,
     "@aws-cdk/aws-ec2:uniqueImdsv2TemplateName": true,
     "@aws-cdk/aws-ecs:arnFormatIncludesClusterName": true,
@@ -459,6 +464,687 @@ EOF
         cd "${APP_DIR}"
         pnpm create vite@latest frontend
         print_success "Frontend app initialized"
+        
+        # Check if React was selected by looking at package.json
+        if grep -q '"react"' "${APP_DIR}/frontend/package.json" 2>/dev/null; then
+            print_step "Setting up React Router and folder structure..."
+            cd "${APP_DIR}/frontend"
+            
+            # Install React Router
+            npm install react-router-dom
+            
+            # Create folder structure
+            mkdir -p src/components src/context src/pages
+            
+            echo ""
+            ask_question "Which CSS framework would you like to use with React?"
+            echo -e "  ${CYAN}1)${NC} None (plain CSS)"
+            echo -e "  ${CYAN}2)${NC} Material-UI (MUI) ${YELLOW}[default]${NC}"
+            echo -e "  ${CYAN}3)${NC} Tailwind CSS"
+            echo -e "  ${CYAN}4)${NC} AWS Cloudscape"
+            echo ""
+            read -p "$(echo -e "${ARROW} Enter your choice [1-4, default=2]: ")" css_choice
+            css_choice=${css_choice:-2}
+            
+            case $css_choice in
+                2)
+                    print_step "Installing Material-UI..."
+                    npm install @mui/material @emotion/react @emotion/styled
+                    
+                    # Add CSS for full-screen layout
+                    cat > src/index.css <<'MUICSS'
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+MUICSS
+                    
+                    # Create MUI example pages
+                    cat > src/pages/Home.tsx <<'MUIHOME'
+import { Container, Typography, Button, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+export default function Home() {
+  return (
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Box sx={{ textAlign: 'center' }}>
+        <Typography variant="h2" component="h1" gutterBottom>
+          Welcome to Your App
+        </Typography>
+        <Typography variant="h5" color="text.secondary" paragraph>
+          Built with React, Material-UI, and React Router
+        </Typography>
+        <Box sx={{ mt: 4 }}>
+          <Button variant="contained" component={Link} to="/about" sx={{ mr: 2 }}>
+            About
+          </Button>
+          <Button variant="outlined" component={Link} to="/dashboard">
+            Dashboard
+          </Button>
+        </Box>
+      </Box>
+    </Container>
+  );
+}
+MUIHOME
+
+                    cat > src/pages/About.tsx <<'MUIABOUT'
+import { Container, Typography, Paper, Box, Button } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+export default function About() {
+  return (
+    <Container maxWidth="md" sx={{ mt: 4 }}>
+      <Paper elevation={3} sx={{ p: 4 }}>
+        <Typography variant="h3" component="h1" gutterBottom>
+          About
+        </Typography>
+        <Typography variant="body1" paragraph>
+          This is a sample application built with React, Material-UI, and React Router.
+        </Typography>
+        <Typography variant="body1" paragraph>
+          Material-UI provides a comprehensive set of UI components that follow Google's Material Design guidelines.
+        </Typography>
+        <Box sx={{ mt: 3 }}>
+          <Button variant="contained" component={Link} to="/">
+            Back to Home
+          </Button>
+        </Box>
+      </Paper>
+    </Container>
+  );
+}
+MUIABOUT
+
+                    cat > src/pages/Dashboard.tsx <<'MUIDASH'
+import { Container, Typography, Grid, Card, CardContent, CardActions, Button, Box } from '@mui/material';
+import { Link } from 'react-router-dom';
+
+export default function Dashboard() {
+  return (
+    <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+      <Typography variant="h3" component="h1" gutterBottom>
+        Dashboard
+      </Typography>
+      <Grid container spacing={3} sx={{ mt: 2 }}>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                Card 1
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                This is a sample card component
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small">Learn More</Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                Card 2
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Another sample card component
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small">Learn More</Button>
+            </CardActions>
+          </Card>
+        </Grid>
+        <Grid item xs={12} md={4}>
+          <Card>
+            <CardContent>
+              <Typography variant="h5" component="div">
+                Card 3
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Yet another sample card
+              </Typography>
+            </CardContent>
+            <CardActions>
+              <Button size="small">Learn More</Button>
+            </CardActions>
+          </Card>
+        </Grid>
+      </Grid>
+      <Box sx={{ mt: 3 }}>
+        <Button variant="outlined" component={Link} to="/">
+          Back to Home
+        </Button>
+      </Box>
+    </Container>
+  );
+}
+MUIDASH
+
+                    # Create App.tsx with MUI
+                    cat > src/App.tsx <<'MUIAPP'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import { AppBar, Toolbar, Typography, Button, Box, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+import Home from './pages/Home';
+import About from './pages/About';
+import Dashboard from './pages/Dashboard';
+
+const theme = createTheme({
+  palette: {
+    primary: {
+      main: '#1976d2',
+    },
+    secondary: {
+      main: '#dc004e',
+    },
+  },
+});
+
+function App() {
+  return (
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Router>
+        <Box sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+          <AppBar position="static">
+            <Toolbar>
+              <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
+                My App
+              </Typography>
+              <Button color="inherit" component={Link} to="/">
+                Home
+              </Button>
+              <Button color="inherit" component={Link} to="/about">
+                About
+              </Button>
+              <Button color="inherit" component={Link} to="/dashboard">
+                Dashboard
+              </Button>
+            </Toolbar>
+          </AppBar>
+          <Box sx={{ flexGrow: 1, bgcolor: 'background.default', overflow: 'auto' }}>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Routes>
+          </Box>
+        </Box>
+      </Router>
+    </ThemeProvider>
+  );
+}
+
+export default App;
+MUIAPP
+                    print_success "Material-UI installed and configured with example pages"
+                    ;;
+                3)
+                    print_step "Installing Tailwind CSS..."
+                    npm install -D tailwindcss postcss autoprefixer
+                    npx tailwindcss init -p
+                    
+                    # Configure Tailwind
+                    cat > tailwind.config.js <<'TAILWINDEOF'
+/** @type {import('tailwindcss').Config} */
+export default {
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+  ],
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+}
+TAILWINDEOF
+                    
+                    # Add Tailwind directives to CSS
+                    cat > src/index.css <<'TAILWINDCSS'
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+TAILWINDCSS
+
+                    # Create Tailwind example pages
+                    cat > src/pages/Home.tsx <<'TAILWINDHOME'
+import { Link } from 'react-router-dom';
+
+export default function Home() {
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <div className="text-center">
+        <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          Welcome to Your App
+        </h1>
+        <p className="text-xl text-gray-600 mb-8">
+          Built with React, Tailwind CSS, and React Router
+        </p>
+        <div className="space-x-4">
+          <Link
+            to="/about"
+            className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+          >
+            About
+          </Link>
+          <Link
+            to="/dashboard"
+            className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition"
+          >
+            Dashboard
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+TAILWINDHOME
+
+                    cat > src/pages/About.tsx <<'TAILWINDABOUT'
+import { Link } from 'react-router-dom';
+
+export default function About() {
+  return (
+    <div className="container mx-auto px-4 py-16 max-w-3xl">
+      <div className="bg-white rounded-lg shadow-lg p-8">
+        <h1 className="text-4xl font-bold text-gray-900 mb-6">About</h1>
+        <p className="text-gray-700 mb-4">
+          This is a sample application built with React, Tailwind CSS, and React Router.
+        </p>
+        <p className="text-gray-700 mb-6">
+          Tailwind CSS is a utility-first CSS framework that provides low-level utility classes to build custom designs.
+        </p>
+        <Link
+          to="/"
+          className="inline-block bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
+        >
+          Back to Home
+        </Link>
+      </div>
+    </div>
+  );
+}
+TAILWINDABOUT
+
+                    cat > src/pages/Dashboard.tsx <<'TAILWINDDASH'
+import { Link } from 'react-router-dom';
+
+export default function Dashboard() {
+  return (
+    <div className="container mx-auto px-4 py-16">
+      <h1 className="text-4xl font-bold text-gray-900 mb-8">Dashboard</h1>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Card 1</h2>
+          <p className="text-gray-600 mb-4">This is a sample card component</p>
+          <button className="text-blue-600 hover:text-blue-800 font-medium">
+            Learn More →
+          </button>
+        </div>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Card 2</h2>
+          <p className="text-gray-600 mb-4">Another sample card component</p>
+          <button className="text-blue-600 hover:text-blue-800 font-medium">
+            Learn More →
+          </button>
+        </div>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <h2 className="text-2xl font-semibold text-gray-900 mb-2">Card 3</h2>
+          <p className="text-gray-600 mb-4">Yet another sample card</p>
+          <button className="text-blue-600 hover:text-blue-800 font-medium">
+            Learn More →
+          </button>
+        </div>
+      </div>
+      <Link
+        to="/"
+        className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg border-2 border-blue-600 hover:bg-blue-50 transition"
+      >
+        Back to Home
+      </Link>
+    </div>
+  );
+}
+TAILWINDDASH
+
+                    # Create App.tsx with Tailwind
+                    cat > src/App.tsx <<'TAILWINDAPP'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import Dashboard from './pages/Dashboard';
+
+function App() {
+  return (
+    <Router>
+      <div className="h-full bg-gradient-to-br from-blue-50 to-indigo-100 flex flex-col">
+        <nav className="bg-white shadow-lg">
+          <div className="container mx-auto px-4">
+            <div className="flex justify-between items-center py-4">
+              <div className="text-2xl font-bold text-blue-600">My App</div>
+              <div className="space-x-6">
+                <Link to="/" className="text-gray-700 hover:text-blue-600 transition">
+                  Home
+                </Link>
+                <Link to="/about" className="text-gray-700 hover:text-blue-600 transition">
+                  About
+                </Link>
+                <Link to="/dashboard" className="text-gray-700 hover:text-blue-600 transition">
+                  Dashboard
+                </Link>
+              </div>
+            </div>
+          </div>
+        </nav>
+        <div className="flex-grow overflow-auto">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+TAILWINDAPP
+                    print_success "Tailwind CSS installed and configured with example pages"
+                    ;;
+                4)
+                    print_step "Installing AWS Cloudscape..."
+                    npm install @cloudscape-design/components @cloudscape-design/global-styles
+                    
+                    # Create Cloudscape example pages
+                    cat > src/pages/Home.tsx <<'CLOUDSCAPEHOME'
+import { Container, Header, SpaceBetween, Button, Box } from '@cloudscape-design/components';
+import { useNavigate } from 'react-router-dom';
+
+export default function Home() {
+  const navigate = useNavigate();
+  
+  return (
+    <Container
+      header={
+        <Header variant="h1">
+          Welcome to Your App
+        </Header>
+      }
+    >
+      <SpaceBetween size="l">
+        <Box variant="p">
+          Built with React, AWS Cloudscape Design System, and React Router
+        </Box>
+        <SpaceBetween direction="horizontal" size="xs">
+          <Button variant="primary" onClick={() => navigate('/about')}>
+            About
+          </Button>
+          <Button onClick={() => navigate('/dashboard')}>
+            Dashboard
+          </Button>
+        </SpaceBetween>
+      </SpaceBetween>
+    </Container>
+  );
+}
+CLOUDSCAPEHOME
+
+                    cat > src/pages/About.tsx <<'CLOUDSCAPEABOUT'
+import { Container, Header, SpaceBetween, Button, Box } from '@cloudscape-design/components';
+import { useNavigate } from 'react-router-dom';
+
+export default function About() {
+  const navigate = useNavigate();
+  
+  return (
+    <Container
+      header={
+        <Header variant="h1">
+          About
+        </Header>
+      }
+    >
+      <SpaceBetween size="l">
+        <Box variant="p">
+          This is a sample application built with React, AWS Cloudscape Design System, and React Router.
+        </Box>
+        <Box variant="p">
+          Cloudscape is an open-source design system for building intuitive, engaging, and inclusive user experiences at scale.
+        </Box>
+        <Button onClick={() => navigate('/')}>
+          Back to Home
+        </Button>
+      </SpaceBetween>
+    </Container>
+  );
+}
+CLOUDSCAPEABOUT
+
+                    cat > src/pages/Dashboard.tsx <<'CLOUDSCAPEDASH'
+import { Container, Header, SpaceBetween, Button, Cards, Box } from '@cloudscape-design/components';
+import { useNavigate } from 'react-router-dom';
+
+export default function Dashboard() {
+  const navigate = useNavigate();
+  
+  const items = [
+    { name: 'Card 1', description: 'This is a sample card component' },
+    { name: 'Card 2', description: 'Another sample card component' },
+    { name: 'Card 3', description: 'Yet another sample card' },
+  ];
+  
+  return (
+    <SpaceBetween size="l">
+      <Header variant="h1">Dashboard</Header>
+      <Cards
+        cardDefinition={{
+          header: item => item.name,
+          sections: [
+            {
+              id: 'description',
+              content: item => item.description,
+            },
+          ],
+        }}
+        items={items}
+        cardsPerRow={[{ cards: 1 }, { minWidth: 500, cards: 3 }]}
+      />
+      <Button onClick={() => navigate('/')}>
+        Back to Home
+      </Button>
+    </SpaceBetween>
+  );
+}
+CLOUDSCAPEDASH
+
+                    # Create App.tsx with Cloudscape
+                    cat > src/App.tsx <<'CLOUDSCAPEAPP'
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
+import { AppLayout, TopNavigation, SpaceBetween } from '@cloudscape-design/components';
+import '@cloudscape-design/global-styles/index.css';
+import Home from './pages/Home';
+import About from './pages/About';
+import Dashboard from './pages/Dashboard';
+
+function Navigation() {
+  const navigate = useNavigate();
+  
+  return (
+    <TopNavigation
+      identity={{
+        href: '/',
+        title: 'My App',
+        onFollow: (e) => {
+          e.preventDefault();
+          navigate('/');
+        },
+      }}
+      utilities={[
+        {
+          type: 'button',
+          text: 'Home',
+          onClick: () => navigate('/'),
+        },
+        {
+          type: 'button',
+          text: 'About',
+          onClick: () => navigate('/about'),
+        },
+        {
+          type: 'button',
+          text: 'Dashboard',
+          onClick: () => navigate('/dashboard'),
+        },
+      ]}
+    />
+  );
+}
+
+function AppContent() {
+  return (
+    <>
+      <Navigation />
+      <AppLayout
+        navigationHide
+        toolsHide
+        content={
+          <SpaceBetween size="l">
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+            </Routes>
+          </SpaceBetween>
+        }
+      />
+    </>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <AppContent />
+    </Router>
+  );
+}
+
+export default App;
+CLOUDSCAPEAPP
+                    print_success "AWS Cloudscape installed and configured with example pages"
+                    ;;
+                *)
+                    print_info "Skipping CSS framework installation"
+                    
+                    # Create basic pages without CSS framework
+                    cat > src/pages/Home.tsx <<'BASICHOME'
+import { Link } from 'react-router-dom';
+
+export default function Home() {
+  return (
+    <div style={{ padding: '2rem', textAlign: 'center' }}>
+      <h1>Welcome to Your App</h1>
+      <p>Built with React and React Router</p>
+      <div style={{ marginTop: '2rem' }}>
+        <Link to="/about" style={{ marginRight: '1rem' }}>About</Link>
+        <Link to="/dashboard">Dashboard</Link>
+      </div>
+    </div>
+  );
+}
+BASICHOME
+
+                    cat > src/pages/About.tsx <<'BASICABOUT'
+import { Link } from 'react-router-dom';
+
+export default function About() {
+  return (
+    <div style={{ padding: '2rem' }}>
+      <h1>About</h1>
+      <p>This is a sample application built with React and React Router.</p>
+      <div style={{ marginTop: '2rem' }}>
+        <Link to="/">Back to Home</Link>
+      </div>
+    </div>
+  );
+}
+BASICABOUT
+
+                    cat > src/pages/Dashboard.tsx <<'BASICDASH'
+import { Link } from 'react-router-dom';
+
+export default function Dashboard() {
+  return (
+    <div style={{ padding: '2rem' }}>
+      <h1>Dashboard</h1>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '2rem' }}>
+        <div style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
+          <h2>Card 1</h2>
+          <p>This is a sample card component</p>
+        </div>
+        <div style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
+          <h2>Card 2</h2>
+          <p>Another sample card component</p>
+        </div>
+        <div style={{ border: '1px solid #ccc', padding: '1rem', borderRadius: '4px' }}>
+          <h2>Card 3</h2>
+          <p>Yet another sample card</p>
+        </div>
+      </div>
+      <div style={{ marginTop: '2rem' }}>
+        <Link to="/">Back to Home</Link>
+      </div>
+    </div>
+  );
+}
+BASICDASH
+
+                    # Create App.tsx without CSS framework
+                    cat > src/App.tsx <<'BASICAPP'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+import Dashboard from './pages/Dashboard';
+
+function App() {
+  return (
+    <Router>
+      <div style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+        <nav style={{ padding: '1rem', borderBottom: '1px solid #ccc', backgroundColor: '#f8f9fa' }}>
+          <Link to="/" style={{ marginRight: '1rem', textDecoration: 'none', color: '#007bff' }}>Home</Link>
+          <Link to="/about" style={{ marginRight: '1rem', textDecoration: 'none', color: '#007bff' }}>About</Link>
+          <Link to="/dashboard" style={{ textDecoration: 'none', color: '#007bff' }}>Dashboard</Link>
+        </nav>
+        <div style={{ flexGrow: 1, overflow: 'auto' }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+          </Routes>
+        </div>
+      </div>
+    </Router>
+  );
+}
+
+export default App;
+BASICAPP
+                    print_success "React Router configured with basic example pages"
+                    ;;
+            esac
+            
+            print_success "React setup complete with routing and folder structure"
+        fi
         
         # Install frontend dependencies (outside of workspace)
         print_step "Installing frontend dependencies..."
