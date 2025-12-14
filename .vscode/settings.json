@@ -6,18 +6,14 @@
   },
   "typescript.tsdk": "node_modules/typescript/lib",
   "typescript.enablePromptUseWorkspaceTsdk": true,
-  "files.exclude": {
-    "**/node_modules": true,
-    "**/dist": true,
-    "**/.aws-sam": true,
-    "**/cdk.out": true
-  },
+  "files.exclude": {},
   "explorer.excludeGitIgnore": false,
   "search.exclude": {
     "**/coverage": true,
     "**/.aws-sam": true,
     "**/cdk.out": true,
-    "**/pnpm-lock.yaml": true
+    "**/node_modules": true,
+    "**/dist": true
   },
   "[typescript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"

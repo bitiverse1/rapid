@@ -8,6 +8,32 @@ export class ConfigController<T extends BaseConfig> {
   }
 
   /**
+   * Get the prefix for resource naming
+   * * @param override - Optional overrides for prefix, middle, and postfix strings
+   * [prefix][project]-[middle][stage]-[postfix]
+   *
+   * If you omit all overrides, it will return "project-stage"
+   *
+   * @param override.prefix - String to prepend before project name
+   * @param override.middle - String to insert between project name and stage
+   * @param override.postfix - String to append after stage name
+   *
+   * @returns The project prefix string as "project-stage"
+   */
+  prefix(override?: {
+    prefix: string;
+    postfix?: string;
+    middle?: string;
+  }): string {
+    let str = override?.prefix ?? '';
+    str += this.config.project + '-';
+    str += override?.middle ?? '';
+    str += this.config.stage;
+    str += override?.postfix ?? '';
+    return str;
+  }
+
+  /**
    * Get a configuration value by key
    *
    * @param key - The configuration key to retrieve

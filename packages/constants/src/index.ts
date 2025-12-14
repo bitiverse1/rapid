@@ -15,7 +15,7 @@ export const HTTP_STATUS = {
   BAD_GATEWAY: 502,
   SERVICE_UNAVAILABLE: 503,
   GATEWAY_TIMEOUT: 504,
-};
+} as const satisfies Record<string, number>;
 
 // Order Status
 export const ORDER_STATUS = {
@@ -77,7 +77,7 @@ export const PAGINATION = {
   DEFAULT_PAGE: 1,
   DEFAULT_PAGE_SIZE: 20,
   MAX_PAGE_SIZE: 100,
-};
+} as const satisfies Record<string, number>;
 
 // Cache TTL (in seconds)
 export const CACHE_TTL = {
@@ -85,7 +85,7 @@ export const CACHE_TTL = {
   MEDIUM: 300, // 5 minutes
   LONG: 3600, // 1 hour
   DAY: 86400, // 24 hours
-};
+} as const satisfies Record<string, number>;
 
 // API Versioning
 export const API_VERSION = {
@@ -141,6 +141,36 @@ export const SERVICE_PRINCIPALS = {
   VPC_FLOW_LOGS: 'vpc-flow-logs.amazonaws.com',
 };
 
+export const TIMEOUT_SECONDS = {
+  FIVE_MINUTES: 300,
+  TEN_MINUTES: 600,
+  FIFTEEN_MINUTES: 900,
+  THIRTY_MINUTES: 1800,
+  ONE_HOUR: 3600,
+  TWO_HOURS: 7200,
+  THREE_HOURS: 10800,
+  FOUR_HOURS: 14400,
+  FIVE_HOURS: 18000,
+  SIX_HOURS: 21600,
+  SEVEN_HOURS: 25200,
+  EIGHT_HOURS: 28800,
+  NINE_HOURS: 32400,
+  TEN_HOURS: 36000,
+  ELEVEN_HOURS: 39600,
+  TWELVE_HOURS: 43200,
+  ONE_DAY: 86400,
+  TWO_DAYS: 172800,
+  THREE_DAYS: 259200,
+  ONE_WEEK: 604800,
+  TWO_WEEKS: 1209600,
+  THREE_WEEKS: 1814400,
+  ONE_MONTH: 2592000,
+  TWO_MONTHS: 5184000,
+  THREE_MONTHS: 7776000,
+  SIX_MONTHS: 15552000,
+  ONE_YEAR: 31536000,
+} as const satisfies Record<string, number>;
+
 export type AWSRegionType = (typeof AWS_REGIONS)[keyof typeof AWS_REGIONS];
 export type LogLevelType = (typeof LOG_LEVELS)[keyof typeof LOG_LEVELS];
 export type ServicePrincipalType =
@@ -152,3 +182,5 @@ export type HttpStatusType = (typeof HTTP_STATUS)[keyof typeof HTTP_STATUS];
 export type OrderStatusType = (typeof ORDER_STATUS)[keyof typeof ORDER_STATUS];
 export type UserStatusType = (typeof USER_STATUS)[keyof typeof USER_STATUS];
 export type ErrorCodeType = (typeof ERROR_CODES)[keyof typeof ERROR_CODES];
+export type TimeoutSecondsType =
+  (typeof TIMEOUT_SECONDS)[keyof typeof TIMEOUT_SECONDS];

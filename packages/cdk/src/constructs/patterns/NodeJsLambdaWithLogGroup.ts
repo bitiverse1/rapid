@@ -1,5 +1,4 @@
 import { Construct } from 'constructs';
-import { BaseConfig, ConfigController } from '@rapid/config';
 import {
   StandardNodeJsFunction,
   StandardNodeJsFunctionProps,
@@ -14,7 +13,6 @@ import {
 } from '../resources/StandardLambdaRole';
 
 export interface NodeJsLambdaWithLogGroupProps {
-  configCtrl: ConfigController<BaseConfig>;
   lambdaProps: StandardNodeJsFunctionProps;
   roleProps: Omit<StandardLambdaRoleProps, 'roleName'>;
   logGroupProps: Omit<StandardLogGroupProps, 'logGroupName'>;
