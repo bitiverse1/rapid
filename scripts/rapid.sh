@@ -214,10 +214,10 @@ if [ "$APP_TYPE" = "cloud" ]; then
     };
     
     envs.forEach(env => {
-      scripts[\`deploy:\${env}\`] = \`cdk deploy -c environment=\${env}\`;
-      scripts[\`synth:\${env}\`] = \`cdk synth -c environment=\${env}\`;
-      scripts[\`diff:\${env}\`] = \`cdk diff -c environment=\${env}\`;
-      scripts[\`destroy:\${env}\`] = \`cdk destroy -c environment=\${env}\`;
+      scripts[\`deploy:\${env}\`] = \`cdk deploy -c stage=\${env}\`;
+      scripts[\`synth:\${env}\`] = \`cdk synth -c stage=\${env}\`;
+      scripts[\`diff:\${env}\`] = \`cdk diff -c stage=\${env}\`;
+      scripts[\`destroy:\${env}\`] = \`cdk destroy -c stage=\${env}\`;
     });
     
     const pkg = {
@@ -276,11 +276,11 @@ import { configs } from './config';
 
 const app = new cdk.App();
 
-// Get environment from context or default to 'dev'
-const environment = (app.node.tryGetContext('environment') as string | undefined) || 'dev';
+// Get stage from context or default to 'dev'
+const stage = (app.node.tryGetContext('stage') as string | undefined) || 'dev';
 
-// Get configuration controller for the environment
-const configCtrl = getConfig(configs, environment);
+// Get configuration controller for the stage
+const configCtrl = getConfig(configs, stage);
 
 new PASCAL_CASE_NAMEStack(app, `PASCAL_CASE_NAMEStack-${configCtrl.get('stage')}`, {
   env: {
@@ -435,8 +435,8 @@ EOF
   ${env}: {
     stage: '${env}',
     project: '${app_name}',
-    awsAccountId: process.env.AWS_ACCOUNT_ID || '',
-    awsRegion: AWS_REGIONS.US_EAST_1,
+    awsAccountId: '012345678901',
+    awsRegion: AWS_REGIONS.US_WEST_2,
     logLevel: LOG_LEVELS.INFO,
     tags: [
       { key: 'Application', value: '${app_name}' },
