@@ -147,6 +147,37 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  apps/test-5:
+    dependencies:
+      '@rapid/cdk':
+        specifier: workspace:*
+        version: link:../../packages/cdk
+      '@rapid/config':
+        specifier: workspace:*
+        version: link:../../packages/config
+      '@rapid/constants':
+        specifier: workspace:*
+        version: link:../../packages/constants
+      '@rapid/types':
+        specifier: workspace:*
+        version: link:../../packages/types
+      aws-cdk-lib:
+        specifier: ^2.161.1
+        version: 2.232.1(constructs@10.4.3)
+      constructs:
+        specifier: ^10.0.0
+        version: 10.4.3
+    devDependencies:
+      '@types/node':
+        specifier: ^22.10.1
+        version: 22.19.2
+      aws-cdk:
+        specifier: ^2.161.1
+        version: 2.1034.0
+      typescript:
+        specifier: ^5.7.2
+        version: 5.9.3
+
   packages/cdk:
     dependencies:
       '@rapid/config':

@@ -30,5 +30,12 @@
     "removeComments": false,
     "types": ["node", "jest"]
   },
-  "exclude": ["node_modules", "dist", "cdk.out", ".aws-sam", "coverage"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "cdk.out",
+    ".aws-sam",
+    "coverage",
+    "scripts/rapid"
+  ]
 }
