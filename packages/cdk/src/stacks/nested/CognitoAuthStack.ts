@@ -16,6 +16,7 @@ export class CognitoAuthStack extends NestedStack {
         userPoolName: `${props.configCtrl.prefix()}-user-pool`,
       },
       defaultClientName: `${props.configCtrl.prefix()}-client`,
+      cognitoDomainPrefix: props.configCtrl.prefix(),
     });
   }
 }

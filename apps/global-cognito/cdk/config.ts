@@ -2,7 +2,7 @@ import { Tag } from '@rapid/types';
 import { AWS_REGIONS, LOG_LEVELS } from '@rapid/constants';
 import type { AppConfig } from './types';
 
-const PROJECT_NAME = 'global-cognito';
+const PROJECT_NAME = 'global-idp';
 
 const TAGS: Tag[] = [
   { key: 'Application', value: PROJECT_NAME },
@@ -14,7 +14,7 @@ export const configs: Record<string, AppConfig> = {
   dev: {
     stage: 'dev',
     project: PROJECT_NAME,
-    awsAccountId: '012345678901',
+    awsAccountId: '275872957807',
     awsRegion: AWS_REGIONS.US_WEST_2,
     logLevel: LOG_LEVELS.INFO,
     tags: TAGS,

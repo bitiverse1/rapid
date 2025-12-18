@@ -4,7 +4,7 @@ export { deepClone } from './deep-clone';
 export { delay } from './delay';
 export { formatDate } from './format-date';
 export { generateUUID } from './generate-uuid';
-export { getEnvironmentVariable } from './get-env-var';
+export { getEnvVar } from './get-env-var';
 export { parseJSON } from './parse-json';
 export { retry } from './retry';
 export { slugify } from './slugify';

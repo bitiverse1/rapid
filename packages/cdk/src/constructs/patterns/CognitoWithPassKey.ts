@@ -1,5 +1,9 @@
 import { Construct } from 'constructs';
 import {
+  UserPoolClientIdentityProvider,
+  ManagedLoginVersion,
+} from 'aws-cdk-lib/aws-cognito';
+import {
   StandardCognitoUserPool,
   StandardCognitoUserPoolProps,
 } from '../resources/StandardCognitoUserPool';
@@ -11,6 +15,7 @@ import {
 export interface CognitoWithPassKeyProps {
   userPoolProps: StandardCognitoUserPoolProps;
   defaultClientName: string;
+  cognitoDomainPrefix: string;
 }
 
 export class CognitoWithPassKey extends Construct {
@@ -24,7 +29,18 @@ export class CognitoWithPassKey extends Construct {
   ) {
     super(scope, id);
     this.userPool = this.createUserPool();
-    this.addClient({ userPoolClientName: props.defaultClientName });
+
+    this.userPool.addDomain('CognitoDomain', {
+      cognitoDomain: {
+        domainPrefix: this.props.cognitoDomainPrefix,
+      },
+      managedLoginVersion: ManagedLoginVersion.NEWER_MANAGED_LOGIN,
+    });
+
+    this.addClient({
+      userPoolClientName: props.defaultClientName,
+      supportedIdentityProviders: [UserPoolClientIdentityProvider.COGNITO],
+    });
   }
 
   private createUserPool(): StandardCognitoUserPool {
