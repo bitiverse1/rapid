@@ -44,7 +44,16 @@ echo ""
 while true; do
     ask_question "What is the name of your application?"
     print_info "Use lowercase letters, numbers, and hyphens only (e.g., 'my-awesome-app')"
+    if [ "$APP_TYPE" = "cli" ]; then
+        print_info "CLI apps will be prefixed with 'cli-'"
+    fi
     read -p "$(echo -e "${ARROW} App name: ")" app_name
+    
+    # Prefix CLI apps with 'cli-' if not already prefixed
+    if [ "$APP_TYPE" = "cli" ] && [[ ! $app_name =~ ^cli- ]]; then
+        app_name="cli-${app_name}"
+        print_info "App name updated to: ${app_name}"
+    fi
     
     validate_app_name "$app_name"
     result=$?

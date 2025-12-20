@@ -63,21 +63,58 @@ export default [
       '@typescript-eslint/no-empty-object-type': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/no-non-null-assertion': 'warn',
-      'import/order': [
+      'import/order': 'off',
+      // Disallow eslint-disable comments in src code
+      'no-warning-comments': [
         'error',
         {
-          groups: [
-            'external',
-            'internal',
-            'builtin',
-            'parent',
-            'sibling',
-            'index',
-          ],
-          'newlines-between': 'never',
-          alphabetize: { order: 'desc', caseInsensitive: false },
+          terms: ['eslint-disable'],
+          location: 'anywhere',
         },
       ],
+    },
+  },
+  // Allow eslint-disable in test files
+  {
+    files: [
+      '**/*.test.ts',
+      '**/*.test.tsx',
+      '**/*.spec.ts',
+      '**/*.spec.tsx',
+      '**/tests/**/*.ts',
+      '**/tests/**/*.tsx',
+      '**/__tests__/**/*.ts',
+      '**/__tests__/**/*.tsx',
+    ],
+    languageOptions: {
+      globals: {
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        jest: 'readonly',
+      },
+    },
+    rules: {
+      'no-warning-comments': 'off',
+    },
+  },
+  // Config files can use CommonJS
+  {
+    files: ['**/*.config.js', '**/jest.config.js', '**/.eslintrc.js'],
+    languageOptions: {
+      globals: {
+        module: 'readonly',
+        require: 'readonly',
+        __dirname: 'readonly',
+        __filename: 'readonly',
+        exports: 'readonly',
+        process: 'readonly',
+      },
     },
   },
   prettierConfig,
